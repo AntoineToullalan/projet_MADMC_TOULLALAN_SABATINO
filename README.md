@@ -1,1 +1,2 @@
-# projet_MADMC_TOULLALAN_SABATINO
+# Projet de MADMC : 
+TOULLALAN Antoine et SABATINO Francesco 
