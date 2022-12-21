@@ -1,3 +1,5 @@
+#import gurobipy as gp
+
 
 #une solution x sera une liste [[x11,x12,...,x1n]
 #                                ...
@@ -7,6 +9,7 @@
 # où les variables xij sont binaires : xij vaut 1 si l'objet i est attribué à l'individu j
 
 # U[i][j] -> utilité de l'objet i pour l'individu j
+
 U = [[12,20,6,5,8],
      [5,12,6,8,5],
      [8,5,11,5,6],
@@ -40,6 +43,35 @@ def fonction_objectif_OWA(alpha,x):
     z.sort()           
     return (z,w)
 
+########################  CREATE PL ######################
+def programme_lineaire():
+    nb_objets = len(U)
+    nb_individus = len(U[0])
+    
+    m = gp.Model()
+    
+    # Create variables
+    x = m.addVar(vtype='B', name="x")
+    y = m.addVar(vtype='B', name="y")
+    z = m.addVar(vtype='B', name="z")
+    
+    # Set objective function
+    m.setObjective(x + y + 2 * z, gp.GRB.MAXIMIZE)
+    
+    # Add constraints
+    m.addConstr(x + 2 * y + 3 * z <= 4)
+    m.addConstr(x + y >= 1)
+    
+    # Solve it!
+    m.optimize()
+    
+    return m
+    
+
+print(f"Optimal objective value: {m.objVal}")
+print(f"Solution values: x={x.X}, y={y.X}, z={z.X}")
+
+
 #########################  MAIN  ##########################
 
 x=[[1,0,0,0,0],
@@ -65,6 +97,41 @@ for i in range(len(z)):
     f += z[i]*w[i]
 
 print(f)
+
+'''
+MODELE :
+    
+# Solve the following MIP:
+#  maximize
+#        x +   y + 2 z
+#  subject to
+#        x + 2 y + 3 z <= 4
+#        x +   y       >= 1
+#        x, y, z binary
+
+import gurobipy as gp
+
+# Create a new model
+m = gp.Model()
+
+# Create variables
+x = m.addVar(vtype='B', name="x")
+y = m.addVar(vtype='B', name="y")
+z = m.addVar(vtype='B', name="z")
+
+# Set objective function
+m.setObjective(x + y + 2 * z, gp.GRB.MAXIMIZE)
+
+# Add constraints
+m.addConstr(x + 2 * y + 3 * z <= 4)
+m.addConstr(x + y >= 1)
+
+# Solve it!
+m.optimize()
+
+print(f"Optimal objective value: {m.objVal}")
+print(f"Solution values: x={x.X}, y={y.X}, z={z.X}")
+'''
     
 
 
