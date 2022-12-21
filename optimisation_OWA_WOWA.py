@@ -21,6 +21,7 @@ def vecteurs_ponderations_w(alpha,n):
     vecteurs = []
     for i in range(1,n+1):
         wi = pow((n-i+1)/n,alpha) - pow((n-i)/n,alpha)
+        wi = round(wi,4)
         vecteurs.append(wi)
     return vecteurs
 
@@ -32,13 +33,38 @@ def fonction_objectif_OWA(alpha,x):
     z = [0 for _ in range(n)]
     w = vecteurs_ponderations_w(alpha,n)
     
-    for i in m:
-        for j in n:
+    for i in range(m):
+        for j in range(n):
             if(x[i][j] == 1): #si l'objet i est attribué à j on ajoute l'utilité de l'objet à l'utilité de j
                 z[j] += U[i][j]
-                
-    return (z.sort(),w)
-    
+    z.sort()           
+    return (z,w)
+
+#########################  MAIN  ##########################
+
+x=[[1,0,0,0,0],
+   [0,1,0,0,0],
+   [0,0,1,0,0],
+   [0,0,0,1,0],
+   [0,0,0,0,1]
+   ]
+
+alpha=2
+
+z,w = fonction_objectif_OWA(alpha,x)   
+print("z ordonné : ")
+print(z)
+
+print("poids w : ")
+print(w)
+
+print("valeur de la fonction objectif : ")
+
+f = 0
+for i in range(len(z)):
+    f += z[i]*w[i]
+
+print(f)
     
 
 
