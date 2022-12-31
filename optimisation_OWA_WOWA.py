@@ -1,5 +1,4 @@
-#import gurobipy as gp
-
+#from gurobipy import *
 
 #une solution x sera une liste [[x11,x12,...,x1n]
 #                                ...
@@ -8,13 +7,6 @@
 #                                [xm1,xm2,...,xmn]]
 # où les variables xij sont binaires : xij vaut 1 si l'objet i est attribué à l'individu j
 
-# U[i][j] -> utilité de l'objet i pour l'individu j
-
-U = [[12,20,6,5,8],
-     [5,12,6,8,5],
-     [8,5,11,5,6],
-     [6,8,6,11,5],
-     [5,6,8,7,7]]
 
 def vecteurs_ponderations_w(alpha,n):
     #renvoie le famille de vecteurs de pondérations wi(alpha) pour i=1...n
@@ -28,7 +20,7 @@ def vecteurs_ponderations_w(alpha,n):
         vecteurs.append(wi)
     return vecteurs
 
-def fonction_objectif_OWA(alpha,x):
+def fonction_objectif_OWA(alpha,x,U):
     #renvoie un tuple composé de la liste z(i) ordonnée et la liste des poids wi pour la solution x
     n = len(x[0]) #nombre d'individus
     m = len(x) #nombre d'objets
@@ -43,96 +35,136 @@ def fonction_objectif_OWA(alpha,x):
     z.sort()           
     return (z,w)
 
-########################  CREATE PL ######################
-def programme_lineaire():
+def valeur_fonction_objectif(z,w):
+    f=0
+    for i in range(len(z)):
+        f += z[i]*w[i]
+    return f
+
+########################  on résoud le PL de manière exhaustive ######################
+def solutions_attributions(alpha,n_objet,nb_individus):
+    res = []
+    
+    if(n_objet==0):
+        return res
+    
+    sol_rec = solutions_attributions(alpha,n_objet-1,nb_individus)
+    
+    res2=[]
+    #pour l'objet n_objet on regarde toute les solutions possibles (tout les individus auquel il peut être attribué)
+    for i in range(nb_individus):
+        ligne=[0 for _ in range(nb_individus)]
+        ligne[i] = 1 #attribué à l'individu i
+        res2.append([ligne])
+        
+        if(sol_rec != []):
+            for sol in sol_rec:
+                sol_copie = sol.copy()
+                sol_copie.append(ligne)
+                res += [sol_copie]
+        else:
+            res = res2
+
+    return res
+   
+
+def methode_exhaustive(alpha,U):
+    fmax=0
+    sol_max=[]
+    nb_objets = len(U)
+    nb_individus = len(U[0])
+    solutions = solutions_attributions(alpha,nb_objets,nb_individus)
+    for x in solutions:
+        z,w = fonction_objectif_OWA(alpha,x,U)
+        f = valeur_fonction_objectif(z,w)
+        if(f>fmax):
+            fmax=f
+            sol_max=x
+    
+    return (fmax,sol_max)
+    
+def composantes_solution(sol,alpha,U):
+    #renvoie les composantes non modifiées et les composantes de Lorenz de la solution 
+    z,_ = fonction_objectif_OWA(alpha,sol,U)
+    val_lorenz = []
+    somme = 0
+    for zi in z:
+        somme+=zi
+        val_lorenz.append(somme)
+    return (val_lorenz,z)
+    
+
+'''
+########################  solve PL with gurobi ######################
+
+def PL_OWA(w,U):
     nb_objets = len(U)
     nb_individus = len(U[0])
     
-    m = gp.Model()
+    m = Model()
     
     # Create variables
-    x = m.addVar(vtype='B', name="x")
-    y = m.addVar(vtype='B', name="y")
-    z = m.addVar(vtype='B', name="z")
+    x=[]
+    for i in range(1,nb_objets+1):
+        x.append([])
+        for j in range(1,nb_individus+1):
+            x[i-1].append(m.addVar(vtype='B', name="x_"+str(i)+"_"+str(j)))
     
-    # Set objective function
-    m.setObjective(x + y + 2 * z, gp.GRB.MAXIMIZE)
+    # maj du modele pour integrer les nouvelles variables
+    m.update()
+    
+    # ajout de la fonction objectif
+    obj = LinExpr();
+    liste_zi=[]
+    for i in range(nb_objets):
+        zi = 0
+        for j in range(nb_individus):
+            zi += U[i][j] * x[i][j]
+        liste_zi.append(zi)
+        
+    liste_zi=liste_zi.sort()
+    for i in range(nb_objets):
+        obj += liste_zi[i] * w[i]
+            
+    # definition de l'objectif
+    m.setObjective(obj,GRB.MAXIMIZE)
     
     # Add constraints
-    m.addConstr(x + 2 * y + 3 * z <= 4)
-    m.addConstr(x + y >= 1)
+    for i in range(nb_objets):
+        m.addConstr(quicksum(x[i][j] for j in range(nb_individus)) <= 1, "Contrainte%d" % i) #chaque objet est attribué à au plus un individu
     
     # Solve it!
     m.optimize()
+    print(f"Optimal objective value: {m.objVal}")
+    sol=[]
+    for i in range(nb_objets):
+        sol.append([])
+        for j in range(nb_individus):
+            sol[i].append(x[i][j].x)
+    print(sol)
     
-    return m
+    return sol
     
-
-print(f"Optimal objective value: {m.objVal}")
-print(f"Solution values: x={x.X}, y={y.X}, z={z.X}")
-
-
+'''
+'''
 #########################  MAIN  ##########################
 
-x=[[1,0,0,0,0],
-   [0,1,0,0,0],
-   [0,0,1,0,0],
-   [0,0,0,1,0],
-   [0,0,0,0,1]
-   ]
+# U[i][j] -> utilité de l'objet i pour l'individu j
 
-alpha=2
+U = [[12,20,6,5,8],
+     [5,12,6,8,5],
+     [8,5,11,5,6],
+     [6,8,6,11,5],
+     [5,6,8,7,7]]
 
-z,w = fonction_objectif_OWA(alpha,x)   
-print("z ordonné : ")
-print(z)
+alpha=1
 
-print("poids w : ")
-print(w)
-
-print("valeur de la fonction objectif : ")
-
-f = 0
-for i in range(len(z)):
-    f += z[i]*w[i]
-
+f,sol = methode_exhaustive(alpha,U)
 print(f)
-
+print(sol)
 '''
-MODELE :
-    
-# Solve the following MIP:
-#  maximize
-#        x +   y + 2 z
-#  subject to
-#        x + 2 y + 3 z <= 4
-#        x +   y       >= 1
-#        x, y, z binary
 
-import gurobipy as gp
 
-# Create a new model
-m = gp.Model()
-
-# Create variables
-x = m.addVar(vtype='B', name="x")
-y = m.addVar(vtype='B', name="y")
-z = m.addVar(vtype='B', name="z")
-
-# Set objective function
-m.setObjective(x + y + 2 * z, gp.GRB.MAXIMIZE)
-
-# Add constraints
-m.addConstr(x + 2 * y + 3 * z <= 4)
-m.addConstr(x + y >= 1)
-
-# Solve it!
-m.optimize()
-
-print(f"Optimal objective value: {m.objVal}")
-print(f"Solution values: x={x.X}, y={y.X}, z={z.X}")
-'''
-    
 
 
 
