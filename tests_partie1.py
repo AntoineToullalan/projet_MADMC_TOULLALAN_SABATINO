@@ -52,16 +52,23 @@ def tests_1_1(affiche_valeurs=False,affiche_composantes=False,affiche_Lorenz=Fal
                 plt.title("alpha = "+str(all_alpha[i]))
                 plt.show()
                 i+=1
-            
-            
-        
-    
-    
-    
+
     plt.show()
+
+def tests_1_2():
+    for n in [5,10,15]:
+        dix_matrices = genere_matrice_ensemble(n)
+        temps_moyen = 0
+        for matrice in dix_matrices:
+            for alpha in [1+0.1*i for i in range(10)]:
+                print(alpha)
+                f,sol = methode_exhaustive(alpha,matrice)
+            
     
 ################################## MAIN ################################
-tests_1_1(affiche_valeurs=True)
+#tests_1_1(affiche_valeurs=True)
+tests_1_2()
+
 
             
     

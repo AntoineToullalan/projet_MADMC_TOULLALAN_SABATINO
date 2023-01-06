@@ -1,5 +1,5 @@
 #from gurobipy import *
-
+import random
 #une solution x sera une liste [[x11,x12,...,x1n]
 #                                ...
 #                                [xi1,xi2,...,xin]
@@ -71,6 +71,7 @@ def solutions_attributions(alpha,n_objet,nb_individus):
 def methode_exhaustive(alpha,U):
     fmax=0
     sol_max=[]
+    print(U)
     nb_objets = len(U)
     nb_individus = len(U[0])
     solutions = solutions_attributions(alpha,nb_objets,nb_individus)
@@ -82,6 +83,7 @@ def methode_exhaustive(alpha,U):
             sol_max=x
     
     return (fmax,sol_max)
+
     
 def composantes_solution(sol,alpha,U):
     #renvoie les composantes non modifiées et les composantes de Lorenz de la solution 
@@ -92,9 +94,31 @@ def composantes_solution(sol,alpha,U):
         somme+=zi
         val_lorenz.append(somme)
     return (val_lorenz,z)
+
+def genere_matrice_unite(n,p,upper_bound_cost):
+    #les couts de la matrice sont entre 0 et upper_bound_cost et la taille est de n * p
+    if(p < n):
+        raise Exception("p est inférieur à n dans la matrice de coût")
+    if(upper_bound_cost < 0):
+        raise Exception("Les coûts de la matrice doivent être supérieur à 0")
+    matrice = []
+    for i in range(n):
+        matrice.append([])
+        for j in range(p):
+            matrice[i].append(random.randrange(upper_bound_cost+1))
+    return matrice
+
+def genere_matrice_ensemble(n):
+    #genere 10 matrice pour n = n et p = 5*n et upper_bound_cost=20
+    p = 5*n
+    upper_bound_cost = 20
+    
+    ensemble_matrice = []
+    for i in range(10):
+        ensemble_matrice.append(genere_matrice_unite(n,p,upper_bound_cost))
+    return ensemble_matrice
     
 
-'''
 ########################  solve PL with gurobi ######################
 
 def PL_OWA(w,U):
@@ -114,16 +138,18 @@ def PL_OWA(w,U):
     m.update()
     
     # ajout de la fonction objectif
-    obj = LinExpr();
+    
     liste_zi=[]
     for i in range(nb_objets):
         zi = 0
         for j in range(nb_individus):
             zi += U[i][j] * x[i][j]
         liste_zi.append(zi)
+
+    obj = LinExpr();
+    obj=0
         
-    liste_zi=liste_zi.sort()
-    for i in range(nb_objets):
+    for i in range(nb_individus):
         obj += liste_zi[i] * w[i]
             
     # definition de l'objectif
@@ -131,9 +157,10 @@ def PL_OWA(w,U):
     
     # Add constraints
     for i in range(nb_objets):
-        m.addConstr(quicksum(x[i][j] for j in range(nb_individus)) <= 1, "Contrainte%d" % i) #chaque objet est attribué à au plus un individu
+        m.addConstr(quicksum(x[i][j] for j in range(nb_individus)) <= 1, "Contrainte %d" % i) #chaque objet est attribué à au plus un individu
     
     # Solve it!
+    m.update()
     m.optimize()
     print(f"Optimal objective value: {m.objVal}")
     sol=[]
@@ -141,12 +168,11 @@ def PL_OWA(w,U):
         sol.append([])
         for j in range(nb_individus):
             sol[i].append(x[i][j].x)
-    print(sol)
     
     return sol
     
-'''
-'''
+
+
 #########################  MAIN  ##########################
 
 # U[i][j] -> utilité de l'objet i pour l'individu j
@@ -157,14 +183,16 @@ U = [[12,20,6,5,8],
      [6,8,6,11,5],
      [5,6,8,7,7]]
 
-alpha=1
+alpha=2
+'''
+n = len(U)
+w = vecteurs_ponderations_w(alpha,n)
+sol = PL_OWA(w,U)
+print(sol)
+
 
 f,sol = methode_exhaustive(alpha,U)
 print(f)
 print(sol)
 '''
-
-
-
-
 
