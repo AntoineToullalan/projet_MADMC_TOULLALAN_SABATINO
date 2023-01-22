@@ -1,6 +1,7 @@
 from PL_OWA import *
 from PL_WOWA import *
 from utils_PL import *
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -103,45 +104,48 @@ def tests_1_3():
         j=0
         for z in all_lorenz:
             fig = plt.figure("vecteur poids = "+str(liste_vect[i][j]))
-            plt.ylabel('composantes de Lorenz')
+            plt.ylabel('utilités de la solution')
             ax = fig.add_axes([0,0,1,1])
-            Li = ["L "+str(j) for j in range(len(z))]
+            Li = ["z "+str(j+1) for j in range(len(z))]
             ax.bar(Li,z)
             j+=1
         plt.show()    
         i+=1
         
     return opt_list
-'''
-def affichage():
-    #all_all_lorenz = [[[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 0.0, 0.0, 51.0], [0.0, 0.0, 0.0, 0.0, 51.0], [0.0, 0.0, 0.0, 0.0, 51.0], [0.0, 0.0, 0.0, 0.0, 51.0]], [[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 0.0, 12.0, 43.0], [0.0, 0.0, 0.0, 0.0, 36.0], [0.0, 0.0, 0.0, 0.0, 36.0], [0.0, 0.0, 0.0, 0.0, 36.0]], [[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 0.0, 22.0, 54.0], [0.0, 0.0, 0.0, 20.0, 50.0], [0.0, 0.0, 0.0, 0.0, 35.0], [0.0, 0.0, 0.0, 0.0, 35.0]], [[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 11.0, 22.0, 62.0], [0.0, 0.0, 0.0, 0.0, 36.0], [0.0, 0.0, 0.0, 0.0, 36.0], [0.0, 0.0, 0.0, 0.0, 36.0]], [[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 0.0, 22.0, 54.0], [0.0, 0.0, 0.0, 0.0, 33.0], [0.0, 0.0, 0.0, 0.0, 33.0]]]
-    all_all_lorenz = [[[40.0, 8.0, 11.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [12.0, 31.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [32.0, 0.0, 22.0, 0.0, 0.0], [20.0, 0.0, 30.0, 0.0, 0.0], [0.0, 0.0, 35.0, 0.0, 0.0], [0.0, 0.0, 35.0, 0.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [40.0, 0.0, 11.0, 11.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [40.0, 8.0, 11.0, 0.0, 0.0], [32.0, 0.0, 0.0, 0.0, 22.0], [0.0, 0.0, 0.0, 0.0, 33.0], [0.0, 0.0, 0.0, 0.0, 33.0]]]    
-    vects = liste_vect_tests_WOWA()
-    j=0
-    for all_lorenz in all_all_lorenz:
-        i=0
-        for z in all_lorenz:
-            fig = plt.figure()
-            ax = fig.add_axes([0,0,1,1])
-            ax.set_title("vecteur poids = "+str(vects[j][i]))
-            Li = ["z "+str(j) for j in range(len(z))]
-            ax.bar(Li,z)
+
+def tests_1_4():
+    #calcul les temps de résolution moyen du PL OWA pour n=5,10,15
+    temps_moyen_n=[]
+    alpha = 2
+    for n in [5,10,15]:
+        dix_matrices = genere_matrice_ensemble(n)
+        temps_moyen = 0
+        i = 0
+        for matrice in dix_matrices:
+            t=time.time()
+            sol = solve_wowa(matrice,[0.3,0.1,0.2,0.2,0.2],alpha)
+            temps_moyen+= (time.time() - t)
             i+=1
-        plt.show()   
-        j+=1
-'''
+        temps_moyen_n.append(temps_moyen/i)
+    return temps_moyen_n
             
 ################################## MAIN ################################
 #TEST 1.1
 #tests_1_1(affiche_Lorenz=True)
-#temps = tests_1_2()
 
 #TEST 1.2
+#temps = tests_1_2()
 #print("temps de calcul du PL OWA pour des matrices de différentes tailles : ")
 #print(temps)
 
 #TEST 1.3
-tests_1_3()
+#tests_1_3()
+
+#TEST 1.4
+temps = tests_1_4()
+print("temps de calcul du PL WOWA pour des matrices de différentes tailles : ")
+print(temps)
 
 
             

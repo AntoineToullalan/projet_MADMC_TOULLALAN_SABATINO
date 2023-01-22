@@ -1,6 +1,6 @@
 import numpy as np
 from utils_PL import *
-#from gurobipy import *
+from gurobipy import *
 
 def solve_wowa(U, p_vect, alpha):
     n = len(U)

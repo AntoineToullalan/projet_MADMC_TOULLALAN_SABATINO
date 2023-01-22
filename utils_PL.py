@@ -1,4 +1,4 @@
-#from gurobipy import *
+from gurobipy import *
 import random
 import numpy as np
 
@@ -144,7 +144,7 @@ def ponderations_phi(p, alpha):
     return p**alpha
 
 def utilite_solution(sol,U):
-    #renvoie les composantes de Lorenz de la solution
+    #renvoie les valeurs des utilités de la solution
     z=[]
     for i in range(len(sol)):
         somme=0
@@ -152,10 +152,6 @@ def utilite_solution(sol,U):
             somme += sol[i][j] * U[i][j]
         z.append(somme)
         i+=1
-    
-    z.sort()
-    for i in range(len(z)-1):
-        z[i+1]=z[i]+z[i+1]
     
     return z
             
