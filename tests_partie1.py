@@ -1,21 +1,23 @@
 from PL_OWA import *
+from PL_WOWA import *
 from utils_PL import *
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 
+U = [[12,20,6,5,8],
+    [5,12,6,8,5],
+    [8,5,11,5,6],
+    [6,8,6,11,5],
+    [5,6,8,7,7]]
+n = len(U)
+p = len(U[0])
+    
 def tests_1_1(affiche_valeurs=False,affiche_composantes=False,affiche_Lorenz=False):
     #affiche... -(si affiche_valeurs=True) l'évolution de la somme des utilités en fonction de alpha
     #           -(si affiche_composantes=True) la valeur des utilités des individus pour différentes valeurs de alpha
     #           -(si affiche_Lorenz=True) les composantes de Lorenz pour différentes valeurs de alpha
     # U[i][j] -> utilité de l'objet i pour l'individu j
-    U = [[12,20,6,5,8],
-         [5,12,6,8,5],
-         [8,5,11,5,6],
-         [6,8,6,11,5],
-         [5,6,8,7,7]]
-    n = len(U)
-    p = len(U[0])
     
     all_alpha = [1 + 0.1*i for i in range(5)]
     all_val = []
@@ -85,12 +87,61 @@ def tests_1_2():
                 
                 
             
-    
+def tests_1_3():
+    alpha = 2
+    vects = liste_vect_tests_WOWA()
+    i=0
+    opt_list=[]
+    for liste_vect in vects:
+        all_lorenz=[]
+        for vect in liste_vect:
+            sol, valeur_sol =solve_wowa(U,vect,alpha)
+            vect_lorenz = utilite_solution(sol,U)
+            all_lorenz.append(vect_lorenz) 
+        opt_list.append(all_lorenz)
+        
+        j=0
+        for z in all_lorenz:
+            fig = plt.figure("vecteur poids = "+str(liste_vect[i][j]))
+            plt.ylabel('composantes de Lorenz')
+            ax = fig.add_axes([0,0,1,1])
+            Li = ["L "+str(j) for j in range(len(z))]
+            ax.bar(Li,z)
+            j+=1
+        plt.show()    
+        i+=1
+        
+    return opt_list
+'''
+def affichage():
+    #all_all_lorenz = [[[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 0.0, 0.0, 51.0], [0.0, 0.0, 0.0, 0.0, 51.0], [0.0, 0.0, 0.0, 0.0, 51.0], [0.0, 0.0, 0.0, 0.0, 51.0]], [[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 0.0, 12.0, 43.0], [0.0, 0.0, 0.0, 0.0, 36.0], [0.0, 0.0, 0.0, 0.0, 36.0], [0.0, 0.0, 0.0, 0.0, 36.0]], [[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 0.0, 22.0, 54.0], [0.0, 0.0, 0.0, 20.0, 50.0], [0.0, 0.0, 0.0, 0.0, 35.0], [0.0, 0.0, 0.0, 0.0, 35.0]], [[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 11.0, 22.0, 62.0], [0.0, 0.0, 0.0, 0.0, 36.0], [0.0, 0.0, 0.0, 0.0, 36.0], [0.0, 0.0, 0.0, 0.0, 36.0]], [[0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 8.0, 19.0, 59.0], [0.0, 0.0, 0.0, 22.0, 54.0], [0.0, 0.0, 0.0, 0.0, 33.0], [0.0, 0.0, 0.0, 0.0, 33.0]]]
+    all_all_lorenz = [[[40.0, 8.0, 11.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [12.0, 31.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [32.0, 0.0, 22.0, 0.0, 0.0], [20.0, 0.0, 30.0, 0.0, 0.0], [0.0, 0.0, 35.0, 0.0, 0.0], [0.0, 0.0, 35.0, 0.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [40.0, 0.0, 11.0, 11.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [40.0, 8.0, 11.0, 0.0, 0.0], [32.0, 0.0, 0.0, 0.0, 22.0], [0.0, 0.0, 0.0, 0.0, 33.0], [0.0, 0.0, 0.0, 0.0, 33.0]]]    
+    vects = liste_vect_tests_WOWA()
+    j=0
+    for all_lorenz in all_all_lorenz:
+        i=0
+        for z in all_lorenz:
+            fig = plt.figure()
+            ax = fig.add_axes([0,0,1,1])
+            ax.set_title("vecteur poids = "+str(vects[j][i]))
+            Li = ["z "+str(j) for j in range(len(z))]
+            ax.bar(Li,z)
+            i+=1
+        plt.show()   
+        j+=1
+'''
+            
 ################################## MAIN ################################
-tests_1_1(affiche_Lorenz=True)
-temps = tests_1_2()
-print("temps de calcul du PL OWA pour des matrices de différentes tailles : ")
-print(temps)
+#TEST 1.1
+#tests_1_1(affiche_Lorenz=True)
+#temps = tests_1_2()
+
+#TEST 1.2
+#print("temps de calcul du PL OWA pour des matrices de différentes tailles : ")
+#print(temps)
+
+#TEST 1.3
+tests_1_3()
 
 
             

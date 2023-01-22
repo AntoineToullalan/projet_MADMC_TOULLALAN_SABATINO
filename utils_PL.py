@@ -1,6 +1,6 @@
-from gurobipy import *
+#from gurobipy import *
 import random
-
+import numpy as np
 
 ################## fonctions pour le PL OWA #######################
 
@@ -88,7 +88,6 @@ def methode_exhaustive(alpha,U):
             sol_max=x
     
     return (fmax,sol_max)
-
     
 def composantes_solution(sol,alpha,U):
     #renvoie les composantes non modifiées et les composantes de Lorenz de la solution 
@@ -124,6 +123,71 @@ def genere_matrice_ensemble(n):
     for i in range(10):
         ensemble_matrice.append(genere_matrice_unite(n,p,upper_bound_cost))
     return ensemble_matrice
+
+####################### PL WOWA #######################
+
+def index_ordonne(n, p, U):
+    #retourne la matrice des ordres des valeurs de la matrice utilité et la matrice avec les utilités ordonnées
+    index_ord=[[i for i in range(0,p)] for j in range(0,n)]
+    U1=U.copy()
+    U2=U.copy()
+    for i in range(n):
+        U1[i]=np.sort(U1[i],axis=0)
+        U2[i]=np.sort(U1[i],axis=0)
+        for j in range(p):
+            index=np.where(np.array(U1[i]) == U[i][j])[0][0]
+            index_ord[i][j]=index
+            U1[i][index]=-1
+    return index_ord, U2
+
+def ponderations_phi(p, alpha):
+    return p**alpha
+
+def utilite_solution(sol,U):
+    #renvoie les composantes de Lorenz de la solution
+    z=[]
+    for i in range(len(sol)):
+        somme=0
+        for j in range(len(sol[i])):
+            somme += sol[i][j] * U[i][j]
+        z.append(somme)
+        i+=1
     
+    z.sort()
+    for i in range(len(z)-1):
+        z[i+1]=z[i]+z[i+1]
+    
+    return z
+            
+    
+def composantes_lorenz(sol,alpha,U):
+    #les composantes de Lorenz de la solution 
+    z = utilite_solution(sol,U)
+    val_lorenz = []
+    somme = 0
+    for zi in z:
+        somme+=zi
+        val_lorenz.append(somme)
+    return val_lorenz
+
+def liste_vect_tests_WOWA():
+    #renvoie les vecteurs poids pour les tests du WOWA
+    liste_vect=[]
+    n_steps=4
+    for i in range(5):
+        liste_vect.append([])
+        poids = [1/5]*5
+        for j in range(n_steps+1):
+            if(j!=0):
+                incr=(1-1/5)/n_steps
+                decr=(1/5)/n_steps
+                for k in range(len(poids)):
+                    if(k==i):
+                        poids[k]+=incr
+                    else:
+                        poids[k]-=decr
+                    poids[k]=round(poids[k],2)
+            liste_vect[i].append(poids.copy())  
+    return liste_vect
 
 
