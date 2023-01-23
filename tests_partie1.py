@@ -132,7 +132,7 @@ def tests_1_4():
             
 ################################## MAIN ################################
 #TEST 1.1
-#tests_1_1(affiche_Lorenz=True)
+tests_1_1(affiche_Lorenz=True)
 
 #TEST 1.2
 #temps = tests_1_2()
@@ -143,9 +143,9 @@ def tests_1_4():
 #tests_1_3()
 
 #TEST 1.4
-temps = tests_1_4()
-print("temps de calcul du PL WOWA pour des matrices de différentes tailles : ")
-print(temps)
+#temps = tests_1_4()
+#print("temps de calcul du PL WOWA pour des matrices de différentes tailles : ")
+#print(temps)
 
 
             

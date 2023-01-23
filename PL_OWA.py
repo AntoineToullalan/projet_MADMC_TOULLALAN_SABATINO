@@ -32,13 +32,14 @@ def solve_owa(n,p,w,matrice):
             yi = sum(z[i][j] * matrice[i][j] for j in range(p))
             m.addConstr(maxi >= yi,"maxi est supérieur ou égal à l'utilité de la personne %d"%i)
             m.addConstr(r[k] + b[i][k] >= maxi - yi,"Calcul de la  composante de Lorenz L%d"%i)
+            #m.addConstr(r[k] + b[i][k] >= yi,"Calcul de la  composante de Lorenz L%d"%i)    
     m.update()
     
     obj = LinExpr();
     obj = 0
     for k in range(n):
-            obj += (w_prime[k]*(maxi * (k+1) - (k+1)*r[k] - sum([b[i][k] for i in range(n)])))
-            
+        obj += (w_prime[k]*(maxi * (k+1) - (k+1)*r[k] - sum([b[i][k] for i in range(n)])))
+        #obj += (w_prime[k]*(k*r[k] + sum([b[i][k] for i in range(n)])))
     m.setObjective(obj,GRB.MAXIMIZE)
     m.update()
     m.optimize()    
