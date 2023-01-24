@@ -64,7 +64,7 @@ def PL_graphe_choquet(fonction_croyance):
         sol[(s1,s2)]=var_arcs[(s1,s2)].x
     return sol
     
-fonction_croyance = [0.,0.9,1] # d1=0.4, d2=0.5 et d12=1
+fonction_croyance = [0.,0.9,1] # d1=0., d2=0.9 et d12=1
 sol = PL_graphe_choquet(fonction_croyance) 
 print(sol)   
     

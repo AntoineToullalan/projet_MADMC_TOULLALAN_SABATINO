@@ -41,6 +41,8 @@ def solve_owa(n,p,w,matrice):
         obj += (w_prime[k]*(maxi * (k+1) - (k+1)*r[k] - sum([b[i][k] for i in range(n)])))
         #obj += (w_prime[k]*(k*r[k] + sum([b[i][k] for i in range(n)])))
     m.setObjective(obj,GRB.MAXIMIZE)
+    #m.setObjective(obj,GRB.MINIMIZE)
+
     m.update()
     m.optimize()    
     sol=[]
@@ -71,6 +73,7 @@ w = vecteurs_ponderations_w(alpha,n)
 sol = solve_owa(n,p,w,matrice)
 print(sol)
 '''
+
 
             
     

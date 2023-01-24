@@ -87,29 +87,47 @@ def tests_1_2():
     return temps_moyen_n
                 
                 
-            
+           
 def tests_1_3():
     alpha = 2
     vects = liste_vect_tests_WOWA()
     i=0
     opt_list=[]
     for liste_vect in vects:
-        all_lorenz=[]
+        all_utilite=[]
         for vect in liste_vect:
             sol, valeur_sol =solve_wowa(U,vect,alpha)
-            vect_lorenz = utilite_solution(sol,U)
-            all_lorenz.append(vect_lorenz) 
-        opt_list.append(all_lorenz)
+            vect_utilite = utilite_solution(sol,U)
+            all_utilite.append(vect_utilite) 
+        opt_list.append(all_utilite)       
+        i+=1
         
+    return opt_list
+
+def affichage_tests_1_3():
+    vects = liste_vect_tests_WOWA()
+    #liste des utilites pour alpha = 5
+    all_all_utilite = [[[51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0]], [[51.0, 0.0, 0.0, 0.0, 0.0], [46.0, 8.0, 0.0, 0.0, 0.0], [40.0, 14.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0]], [[51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [40.0, 8.0, 11.0, 0.0, 0.0], [20.0, 0.0, 30.0, 0.0, 0.0], [0.0, 0.0, 35.0, 0.0, 0.0]], [[51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [46.0, 8.0, 0.0, 0.0, 0.0], [32.0, 0.0, 0.0, 22.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0]], [[51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [46.0, 8.0, 0.0, 0.0, 0.0], [32.0, 0.0, 0.0, 0.0, 22.0], [0.0, 0.0, 0.0, 0.0, 33.0]]]
+    #liste des utilites pour alpha = 2
+    #all_all_utilite = [[[40.0, 8.0, 11.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0], [51.0, 0.0, 0.0, 0.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [12.0, 31.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0], [0.0, 36.0, 0.0, 0.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [32.0, 0.0, 22.0, 0.0, 0.0], [20.0, 0.0, 30.0, 0.0, 0.0], [0.0, 0.0, 35.0, 0.0, 0.0], [0.0, 0.0, 35.0, 0.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [40.0, 0.0, 11.0, 11.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0], [0.0, 0.0, 0.0, 36.0, 0.0]], [[40.0, 8.0, 11.0, 0.0, 0.0], [40.0, 8.0, 11.0, 0.0, 0.0], [32.0, 0.0, 0.0, 0.0, 22.0], [0.0, 0.0, 0.0, 0.0, 33.0], [0.0, 0.0, 0.0, 0.0, 33.0]]]
+    i=0
+    opt_list=[]
+    for liste_vect in vects:
+        
+        all_utilite = all_all_utilite[i]
         j=0
-        for z in all_lorenz:
-            fig = plt.figure("vecteur poids = "+str(liste_vect[i][j]))
+        
+        for zi in all_utilite:
+            print(zi)
+            fig = plt.figure("vecteur poids = "+str(liste_vect[j]))
             plt.ylabel('utilités de la solution')
             ax = fig.add_axes([0,0,1,1])
-            Li = ["z "+str(j+1) for j in range(len(z))]
-            ax.bar(Li,z)
+            ax.set_title("vecteur poids = "+str(liste_vect[j]))
+            nom_zi = ["z "+str(j+1) for j in range(len(zi))]
+            ax.bar(nom_zi,zi)
             j+=1
-        plt.show()    
+        plt.show() 
+        
         i+=1
         
     return opt_list
@@ -132,7 +150,7 @@ def tests_1_4():
             
 ################################## MAIN ################################
 #TEST 1.1
-tests_1_1(affiche_Lorenz=True)
+#tests_1_1(affiche_Lorenz=True)
 
 #TEST 1.2
 #temps = tests_1_2()
@@ -140,7 +158,8 @@ tests_1_1(affiche_Lorenz=True)
 #print(temps)
 
 #TEST 1.3
-#tests_1_3()
+print(tests_1_3())
+#affichage_tests_1_3()
 
 #TEST 1.4
 #temps = tests_1_4()
